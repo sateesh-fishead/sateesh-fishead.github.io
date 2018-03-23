@@ -7,7 +7,7 @@
                 this.$slides = this.$slidesContainer.children('li');
                 this.$clipPath;
                 this.$directionControls;
-                
+
                 this.settings = $.extend({
                     autoRotate: false,
                     autoRotateInterval: 6000,
@@ -19,7 +19,7 @@
                     slideHeight : 360,
                     slideWidth : 480,
                 }, options);
-                
+
                 this.slideAngle = 360 / this.$slides.length;
                 this.listAngle=(this.$slides.length-1) * this.slideAngle;
                 this.currentRotationAngle = 0;
@@ -35,7 +35,7 @@
                 this.scrollPoint=$(window).height()/3;
                 this.currentScrollPoint=0;
                 this.setArray=[];
-                
+
                 this.validateMarkup();
                 if(this.markupIsValid){
                     this.renderSlider();
@@ -58,12 +58,12 @@
                     }
                 }
                 //if(this.settings.directionControls){
-                    this.$slider.find('ul.direction-controls .left-arrow button').click(this.handleLeftDirectionClick.bind(this));
-                    this.$slider.find('ul.direction-controls .right-arrow button').click(this.handleRightDirectionClick.bind(this));
-                    $(document).on('click','.slides > li[data-point="45"]', this.handleRightDirectionClick.bind(this));
-                    $(document).on('click','.slides > li[data-point="-45"],.slides > li[data-point="315"]', this.handleLeftDirectionClick.bind(this));
-                    $(document).on('keyup', this.numtype.bind(this));
-                    this.$slidesContainer.on('mousewheel', { mousewheel: { debounce: {delay: 300}}, throttle: {delay: 300}}, this.mouseWheel.bind(this));
+                this.$slider.find('ul.direction-controls .left-arrow button').click(this.handleLeftDirectionClick.bind(this));
+                this.$slider.find('ul.direction-controls .right-arrow button').click(this.handleRightDirectionClick.bind(this));
+                $(document).on('click','.slides > li[data-point="45"]', this.handleRightDirectionClick.bind(this));
+                $(document).on('click','.slides > li[data-point="-45"],.slides > li[data-point="315"]', this.handleLeftDirectionClick.bind(this));
+                $(document).on('keyup', this.numtype.bind(this));
+                this.$slidesContainer.on('mousewheel', { mousewheel: { debounce: {delay: 300}}, throttle: {delay: 300}}, this.mouseWheel.bind(this));
                 //}
             },
             handleDragStart: function(e){
@@ -94,10 +94,9 @@
                             //console.log('currentROtateAngle: '+ this.currentRotationAngle);
                         }
                         if(this.currentlyDragging){
-                            //console.log('dragPos '+(this.dragStartPoint - pageY) / this.settings.slideWidth+' dragStart '+ this.dragStartAngle)
+                            //console.log('dragPos '+(this.dragStartPoint - pageY))
                             this.currentRotationAngle = this.dragStartAngle - ((this.dragStartPoint - pageY) / this.settings.slideWidth * this.slideAngle);
                             //console.log('currentROtateAngle: '+ this.currentRotationAngle);
-
                             this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
                         }
                     }else{
@@ -106,7 +105,7 @@
                             this.currentlyRotating === false  &&
                             (this.dragStartPoint - pageY > 10 || this.dragStartPoint - pageY < -10)
                         ){
-                           //console.log('stopedDragging');
+                            console.log('stopedDragging');
                             //this.stopAutoRotate();
                             if(this.settings.directionControls){
                                 this.$directionControls.css('pointer-events', 'none');
@@ -114,24 +113,19 @@
                             window.getSelection().removeAllRanges();
                             this.currentlyDragging = true;
                             this.dragStartAngle = this.currentScrollPoint;
-
+                            //console.log(this.dragStartAngle);
                         }
                         if(this.currentlyDragging){
-                            //console.log('dragPos '+(this.dragStartPoint - pageY) / $(window).height()+' dragStart '+ this.dragStartAngle)
                             this.currentScrollPoint = this.dragStartAngle - ((this.dragStartPoint - pageY) / $(window).height() * (this.scrollPoint));
-                            //console.log('currentROtateAngle: '+this.currentScrollPoint);
                             if(this.setArray.length > 0){
                                 for (var i = 0; i < this.setArray.length; i++) {
-                                    this.topPos=Math.round(this.currentScrollPoint + this.setArray[i])
+                                    this.topPos=Math.round(this.currentScrollPoint + this.setArray[i]);
                                     this.$slides.eq(i).css('top',this.topPos);
-                                    //this.$slides.eq(i).attr('data-position',this.topPos);
                                 }
                             }
                             this.$slides.each(function(i, el){
                                 var $slide = $(el);
                                 this.setArray.push($slide.attr('data-position'));
-                                $slide.css('top', this.pointPos+'px');
-                                $slide.attr('data-point', (i * this.slideAngle))
                             }.bind(this));
                         }
                     }
@@ -143,17 +137,19 @@
 
                     this.currentlyDragging = false;
                     if($(window).width()>800) {
-                        //console.log('hai '+ this.currentRotationAngle+' hewlo '+this.slideAngle);
-                       // console.log('currentROtateAngle End: '+ this.currentRotationAngle + ' slideAngle '+ (Math.round(this.currentRotationAngle / this.slideAngle)));
+                        console.log('hai '+ this.currentRotationAngle+' hewlo '+this.slideAngle);
                         this.currentRotationAngle = Math.round(this.currentRotationAngle / this.slideAngle) * this.slideAngle;
-
+                        console.log('currentROtateAngle End: '+ this.currentRotationAngle + 'slideAngle '+ this.slideAngle);
                         this.rotate();
                         if (this.settings.directionControls) {
                             this.$directionControls.css('pointer-events', '');
                         }
                     }else{
-                        console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ (Math.round(this.currentScrollPoint / 70)));
-                        this.currentScrollPoint= Math.round(this.currentScrollPoint / 70) * this.scrollPoint;
+                        console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
+                        this.scrollCount=Math.round(this.currentScrollPoint / this.scrollPoint);
+                        this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/3)) * (this.scrollPoint/3);
+
+                        console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ this.scrollPoint);
                         this.scrollpoints();
                         if (this.settings.directionControls) {
                             this.$directionControls.css('pointer-events', '');
@@ -206,7 +202,7 @@
 
                 /* Apply styles to each slide */
                 this.$slides.each(function(i, el){
-                var $slide = $(el);
+                    var $slide = $(el);
                     /* Set distance from point of rotation */
                     $slide.css('transform-origin', 'center '+(innerRadius/2)+'px');
 
@@ -227,7 +223,7 @@
                     //$slide.css('-webkit-clip-path', 'url(#slideClipPath)');
                     //$slide.css('clip-path', 'url(#slideClipPath)');
                 }.bind(this));
-                
+
                 /* Render Arrow Controls */
                 if(this.settings.directionControls){
                     var directionArrowsHTML = '<ul class="direction-controls">';
@@ -260,34 +256,26 @@
                     //console.log('test');
 
                 }
-                console.log('Sateesh '+ this.currentScrollPoint);
+                //console.log('Sateesh '+ this.currentScrollPoint+' hai '+ this.scrollCount);
                 //this.currentScrollPoint
-                this.currentScrollPoint=Math.round(this.currentScrollPoint)
+                this.currentScrollPoint=Math.round(this.currentScrollPoint);
                 this.$slides.css('transition', 'transform '+(this.settings.rotationSpeed)+'s ease-in-out');
-                  //console.log('currentScroll '+Math.round(this.currentScrollPoint));
-                if(this.$slidesContainer.attr('currentPos') == undefined){
-                    this.$slidesContainer.attr('currentPos', Math.round(this.scrollPoint));
+                console.log('currentScroll '+Math.round(this.currentScrollPoint));
+                if(this.$slidesContainer.attr('currentPos')){
+                    if(this.$slidesContainer.attr('currentPos')==this.currentScrollPoint){
+                        this.change=false;
+                    }else{
+                        this.change=true;
+                    }
                 }
-
-                      if(this.$slidesContainer.attr('currentPos')==this.currentScrollPoint || this.currentScrollPoint == 0){
-                          this.change=false;
-                          console.log('true false');
-                      }else{
-                          this.change=true;
-                          console.log('true change');
-                      }
-
-
-                //console.log('currentChange '+ this.$slidesContainer.attr('currentPos') + ' hellwo '+ this.currentScrollPoint);
+                console.log('currentChange '+ this.$slidesContainer.attr('currentPos')+' hellwo '+ this.currentScrollPoint);
                 this.$slides.each(function(i,el){
                     var $slide=$(el);
                     if(this.change == true){
                         if(this.currentScrollPoint < 0 && this.$slidesContainer.attr('currentPos') > this.currentScrollPoint ){
-                            this.actualValue = -this.scrollPoint;
-                           // console.log('up ' + this.scrollPoint);
+                            this.actualValue=-this.scrollPoint;
                         }else{
-                            //console.log('DOwn '+ this.scrollPoint);
-                            this.actualValue = this.scrollPoint;
+                            this.actualValue=this.scrollPoint;
                         }
                         var topValue=parseInt($slide.attr('data-position')) + Math.round(this.actualValue);
                         $slide.css('top',topValue);
@@ -307,7 +295,7 @@
                     this.$slidesContainer.css('transition', 'none');
                     /* keep currentRotationAngle between -360 and 360 */
                     if(this.currentRotationAngle >= 360 || this.currentRotationAngle <= -360){
-                        //console.log('rotatePosible');
+                        console.log('rotatePosible');
                         this.currentRotationAngle = this.currentRotationAngle >= 360 ? this.currentRotationAngle - 360 : this.currentRotationAngle + 360;
                         this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
 
@@ -351,7 +339,7 @@
                 this.$slidesContainer.css('transition', 'transform '+(this.settings.rotationSpeed/1000)+'s ease-in-out');
                 this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
                 this.rotateTimeoutId = setTimeout(function(){
-                   // console.log('test123');
+                    // console.log('test123');
                     this.currentlyRotating = false;
                     this.$slidesContainer.css('transition', 'none');
                     /* keep currentRotationAngle between -360 and 360 */
@@ -407,23 +395,23 @@
                             }
                         }
                     }
-                        var thisPos=this.$slidesContainer.children(':nth-child('+actualValue+')').attr('data-point');
-                        var rotates=Math.abs(thisPos)/this.slideAngle;
-                        var actualValue1=this.$slides.length - rotates;
-                        this.rotateinterval=setInterval(function(){
-                            this.rotateClockwise();
-                            actualValue1--;
-                            if(actualValue1==0){
-                                clearInterval(this.rotateinterval);
-                            }
-                        }.bind(this), this.settings.rotationSpeed/1000)
+                    var thisPos=this.$slidesContainer.children(':nth-child('+actualValue+')').attr('data-point');
+                    var rotates=Math.abs(thisPos)/this.slideAngle;
+                    var actualValue1=this.$slides.length - rotates;
+                    this.rotateinterval=setInterval(function(){
+                        this.rotateClockwise();
+                        actualValue1--;
+                        if(actualValue1==0){
+                            clearInterval(this.rotateinterval);
+                        }
+                    }.bind(this), this.settings.rotationSpeed/1000)
 
                 }else if(e.keyCode == 38 || e.keyCode == 40){
-                        if(e.keyCode == 38){
-                            this.rotateClockwise();
-                        }else{
-                            this.rotateCounterClockwise();
-                        }
+                    if(e.keyCode == 38){
+                        this.rotateClockwise();
+                    }else{
+                        this.rotateCounterClockwise();
+                    }
                 }
             },
             mouseWheel: function(e, delta){
