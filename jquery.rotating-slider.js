@@ -94,9 +94,10 @@
                             //console.log('currentROtateAngle: '+ this.currentRotationAngle);
                         }
                         if(this.currentlyDragging){
-                            //console.log('dragPos '+(this.dragStartPoint - pageY))
+                            //console.log('dragPos '+(this.dragStartPoint - pageY) / this.settings.slideWidth+' dragStart '+ this.dragStartAngle)
                             this.currentRotationAngle = this.dragStartAngle - ((this.dragStartPoint - pageY) / this.settings.slideWidth * this.slideAngle);
                             //console.log('currentROtateAngle: '+ this.currentRotationAngle);
+
                             this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
                         }
                     }else{
@@ -105,7 +106,7 @@
                             this.currentlyRotating === false  &&
                             (this.dragStartPoint - pageY > 10 || this.dragStartPoint - pageY < -10)
                         ){
-                           console.log('stopedDragging');
+                           //console.log('stopedDragging');
                             //this.stopAutoRotate();
                             if(this.settings.directionControls){
                                 this.$directionControls.css('pointer-events', 'none');
@@ -113,12 +114,12 @@
                             window.getSelection().removeAllRanges();
                             this.currentlyDragging = true;
                             this.dragStartAngle = this.currentScrollPoint;
-                            //console.log(this.dragStartAngle);
+
                         }
                         if(this.currentlyDragging){
-                            this.currentScrollPoint = this.dragStartAngle - ((this.dragStartPoint - pageY) / $(window).height() * this.scrollPoint);
-
-                            //console.log(this.currentScrollPoint);
+                            //console.log('dragPos '+(this.dragStartPoint - pageY) / $(window).height()+' dragStart '+ this.dragStartAngle)
+                            this.currentScrollPoint = this.dragStartAngle - ((this.dragStartPoint - pageY) / $(window).height() * (this.scrollPoint));
+                            //console.log('currentROtateAngle: '+this.currentScrollPoint);
                             if(this.setArray.length > 0){
                                 for (var i = 0; i < this.setArray.length; i++) {
                                     this.topPos=Math.round(this.currentScrollPoint + this.setArray[i])
@@ -142,7 +143,8 @@
 
                     this.currentlyDragging = false;
                     if($(window).width()>800) {
-                        console.log('hai '+ this.currentRotationAngle+' hewlo '+this.slideAngle);
+                        //console.log('hai '+ this.currentRotationAngle+' hewlo '+this.slideAngle);
+                       // console.log('currentROtateAngle End: '+ this.currentRotationAngle + ' slideAngle '+ (Math.round(this.currentRotationAngle / this.slideAngle)));
                         this.currentRotationAngle = Math.round(this.currentRotationAngle / this.slideAngle) * this.slideAngle;
 
                         this.rotate();
@@ -150,13 +152,8 @@
                             this.$directionControls.css('pointer-events', '');
                         }
                     }else{
-
-                        //console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
-                        //this.scrollCount=Math.round(this.currentScrollPoint / this.scrollPoint);
                         console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ (Math.round(this.currentScrollPoint / 70)));
                         this.currentScrollPoint= Math.round(this.currentScrollPoint / 70) * this.scrollPoint;
-                        //console.log(this.currentScrollPoint / this.scrollPoint);
-
                         this.scrollpoints();
                         if (this.settings.directionControls) {
                             this.$directionControls.css('pointer-events', '');
@@ -263,27 +260,34 @@
                     //console.log('test');
 
                 }
-                //console.log('Sateesh '+ this.currentScrollPoint+' hai '+ this.scrollCount);
+                console.log('Sateesh '+ this.currentScrollPoint);
                 //this.currentScrollPoint
-                this.currentScrollPoint=Math.round(this.currentScrollPoint);
+                this.currentScrollPoint=Math.round(this.currentScrollPoint)
                 this.$slides.css('transition', 'transform '+(this.settings.rotationSpeed)+'s ease-in-out');
-                  console.log('currentScroll '+Math.round(this.currentScrollPoint));
+                  //console.log('currentScroll '+Math.round(this.currentScrollPoint));
+                if(this.$slidesContainer.attr('currentPos') == undefined){
+                    this.$slidesContainer.attr('currentPos', Math.round(this.scrollPoint));
+                }
 
-                if(this.$slidesContainer.attr('currentPos')){
-                      if(this.$slidesContainer.attr('currentPos')==this.currentScrollPoint){
+                      if(this.$slidesContainer.attr('currentPos')==this.currentScrollPoint || this.currentScrollPoint == 0){
                           this.change=false;
+                          console.log('true false');
                       }else{
                           this.change=true;
+                          console.log('true change');
                       }
-                }
-                console.log('currentChange '+ this.$slidesContainer.attr('currentPos')+' hellwo '+ this.currentScrollPoint);
+
+
+                //console.log('currentChange '+ this.$slidesContainer.attr('currentPos') + ' hellwo '+ this.currentScrollPoint);
                 this.$slides.each(function(i,el){
                     var $slide=$(el);
                     if(this.change == true){
                         if(this.currentScrollPoint < 0 && this.$slidesContainer.attr('currentPos') > this.currentScrollPoint ){
-                            this.actualValue=-this.scrollPoint;
+                            this.actualValue = -this.scrollPoint;
+                           // console.log('up ' + this.scrollPoint);
                         }else{
-                            this.actualValue=this.scrollPoint;
+                            //console.log('DOwn '+ this.scrollPoint);
+                            this.actualValue = this.scrollPoint;
                         }
                         var topValue=parseInt($slide.attr('data-position')) + Math.round(this.actualValue);
                         $slide.css('top',topValue);
@@ -303,7 +307,7 @@
                     this.$slidesContainer.css('transition', 'none');
                     /* keep currentRotationAngle between -360 and 360 */
                     if(this.currentRotationAngle >= 360 || this.currentRotationAngle <= -360){
-                        console.log('rotatePosible');
+                        //console.log('rotatePosible');
                         this.currentRotationAngle = this.currentRotationAngle >= 360 ? this.currentRotationAngle - 360 : this.currentRotationAngle + 360;
                         this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
 
