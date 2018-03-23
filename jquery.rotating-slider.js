@@ -153,8 +153,8 @@
 
                         //console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
                         //this.scrollCount=Math.round(this.currentScrollPoint / this.scrollPoint);
-                        console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ (Math.round(this.currentScrollPoint / 50)));
-                        this.currentScrollPoint= Math.round(this.currentScrollPoint / 50) * this.scrollPoint;
+                        console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ (Math.round(this.currentScrollPoint / 70)));
+                        this.currentScrollPoint= Math.round(this.currentScrollPoint / 70) * this.scrollPoint;
                         //console.log(this.currentScrollPoint / this.scrollPoint);
 
                         this.scrollpoints();
