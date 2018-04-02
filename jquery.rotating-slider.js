@@ -234,6 +234,8 @@
                     this.$slidesContainer.css('height', ($(window).height() * 1.5)+'px');
                     this.$slidesContainer.css('transform', 'translateY(0%)');
                     this.$slidesContainer.css('left', '0px');
+                    //alert(this.$slidesContainer.find('li:last-child').html());
+
                     this.$slides.each(function(i, el){
                         var $slide = $(el);
                         $slide.css('transform', 'translateY(0) rotate(0deg) translateX(0px)');
@@ -242,6 +244,11 @@
                         $slide.attr('data-position',this.topPos)
                         this.setArray.push(this.topPos);
                     }.bind(this));
+                    //prepending last child
+                    this.$slidesContainer.find('li:last-child').css({'top':Math.round('-'+(this.scrollPoint))});
+                    this.$slidesContainer.find('li:last-child').attr('data-position', Math.round('-'+(this.scrollPoint)));
+                    this.$slidesContainer.find('li:last-child').prependTo(this.$slidesContainer);
+
                 }
             },
             scrollpoints: function(){
@@ -269,14 +276,13 @@
                     var $slide=$(el);
                     if(this.change == true){
                         if(this.currentScrollPoint < 0 && this.$slidesContainer.attr('currentPos') > this.currentScrollPoint ){
-                            this.actualValue=-this.scrollPoint;
+                            this.actualValue = -this.scrollPoint;
                         }else{
-                            this.actualValue=this.scrollPoint;
+                            this.actualValue = this.scrollPoint;
                         }
                         var topValue=parseInt($slide.attr('data-position')) + Math.round(this.actualValue);
                         $slide.css('top',topValue);
                         $slide.attr('data-position',topValue);
-
                     }else{
                         var topValue=parseInt($slide.attr('data-position'));
                         $slide.css('top',topValue);
@@ -286,16 +292,20 @@
                 this.$slidesContainer.attr('currentPos',this.currentScrollPoint);
 
                 this.rotateTimeoutId = setTimeout(function(){
-                    // console.log('test123');
-                    this.currentlyRotating = false;
-                    this.$slidesContainer.css('transition', 'none');
-                    /* keep currentRotationAngle between -360 and 360 */
-                    if(this.currentRotationAngle >= 360 || this.currentRotationAngle <= -360){
-                        console.log('rotatePosible');
-                        this.currentRotationAngle = this.currentRotationAngle >= 360 ? this.currentRotationAngle - 360 : this.currentRotationAngle + 360;
-                        this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
-
+                 this.currentlyRotating = false;
+                    this.firstChildPos=this.$slidesContainer.find('li:first-child').attr('data-position');
+                    this.lastChildPos=this.$slidesContainer.find('li:last-child').attr('data-position');
+                    if(this.firstChildPos==0){
+                        this.$slidesContainer.find('li:last-child').css({'top':Math.round('-'+(this.scrollPoint))});
+                        this.$slidesContainer.find('li:last-child').attr('data-position', Math.round('-'+(this.scrollPoint)));
+                        this.$slidesContainer.find('li:last-child').prependTo(this.$slidesContainer);
                     }
+                    if(this.lastChildPos <= (this.scrollPoint*3)){
+                        this.$slidesContainer.find('li:first-child').css({'top':Math.round(this.scrollPoint*3)});
+                        this.$slidesContainer.find('li:first-child').attr('data-position', Math.round(this.scrollPoint*3));
+                        this.$slidesContainer.find('li:first-child').appendTo(this.$slidesContainer);
+                    }
+
                 }.bind(this), this.settings.rotationSpeed);
             },
             rotateClockwise: function(){
