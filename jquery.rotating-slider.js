@@ -76,14 +76,12 @@
 
                     var pageY = (e.type === 'mousemove') ? e.pageY : e.originalEvent.touches[0].pageY;
 
-                    //console.log('pageY: '+ pageY + ' dragPoint '+ (this.dragStartPoint - pageY));
                     if($(window).width()>800){
                         if(
                             this.currentlyDragging === false &&
                             this.currentlyRotating === false  &&
                             (this.dragStartPoint - pageY > 10 || this.dragStartPoint - pageY < -10)
                         ){
-                            //console.log(this.currentRotationAngle);
                             this.stopAutoRotate();
                             if(this.settings.directionControls){
                                 this.$directionControls.css('pointer-events', 'none');
@@ -105,27 +103,25 @@
                             this.currentlyRotating === false  &&
                             (this.dragStartPoint - pageY > 10 || this.dragStartPoint - pageY < -10)
                         ){
-                            console.log('stopedDragging');
-                            //this.stopAutoRotate();
                             if(this.settings.directionControls){
                                 this.$directionControls.css('pointer-events', 'none');
                             }
                             window.getSelection().removeAllRanges();
                             this.currentlyDragging = true;
                             this.dragStartAngle = this.currentScrollPoint;
-                            //console.log(this.dragStartAngle);
                         }
                         if(this.currentlyDragging){
                             this.currentScrollPoint = this.dragStartAngle - ((this.dragStartPoint - pageY) / $(window).height() * (this.scrollPoint));
-                            if(this.setArray.length > 0){
-                                for (var i = 0; i < this.setArray.length; i++) {
-                                    this.topPos=Math.round(this.currentScrollPoint + this.setArray[i]);
-                                    this.$slides.eq(i).css('top',this.topPos);
-                                }
-                            }
+                            this.dragPos=this.dragStartPoint - pageY;
+
+                            this.setArray=[];
                             this.$slides.each(function(i, el){
                                 var $slide = $(el);
                                 this.setArray.push($slide.attr('data-position'));
+                                var thisValue=parseInt(this.setArray[i]);
+                                console.log('arrayValue '+this.setArray[i]+' cp '+ (this.dragPos));
+                                this.topPos = thisValue - (this.dragPos);
+                                $slide.css('top', this.topPos);
                             }.bind(this));
                         }
                     }
