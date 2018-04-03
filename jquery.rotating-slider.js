@@ -47,7 +47,7 @@
             },
             bindEvents: function(){
                 if(this.settings.draggable){
-                    if($(window).width()>800) {
+                    if($(window).width()>767) {
                         this.$slidesContainer.on('mousedown touchstart', this.handleDragStart.bind(this));
                         this.$slidesContainer.on('mousemove touchmove', this.handleDragMove.bind(this));
                         this.$slidesContainer.on('mouseup mouseleave touchend', this.handleDragEnd.bind(this));
@@ -72,7 +72,7 @@
 
                     var pageY = (e.type === 'mousemove') ? e.pageY : e.originalEvent.touches[0].pageY;
 
-                    if($(window).width()>800){
+                    if($(window).width()>767){
                         if(
                             this.currentlyDragging === false &&
                             this.currentlyRotating === false  &&
@@ -128,7 +128,7 @@
                 if(this.currentlyDragging){
 
                     this.currentlyDragging = false;
-                    if($(window).width()>800) {
+                    if($(window).width()>767) {
                         console.log('hai '+ this.currentRotationAngle+' hewlo '+this.slideAngle);
                         this.currentRotationAngle = Math.round(this.currentRotationAngle / this.slideAngle) * this.slideAngle;
                         console.log('currentROtateAngle End: '+ this.currentRotationAngle + 'slideAngle '+ this.slideAngle);
@@ -230,7 +230,7 @@
                     this.$slider.append(directionArrowsHTML);
                     this.$directionControls = this.$slider.find('ul.direction-controls');
                 }
-                if($(window).width()<800){
+                if($(window).width()<768){
                     this.$slidesContainer.css('width', '100%');
                     this.$slidesContainer.css('height', ($(window).height() * 1.5)+'px');
                     this.$slidesContainer.css('transform', 'translateY(0%)');
@@ -257,10 +257,7 @@
                 if(this.rotateTimeoutId){
                     clearTimeout(this.rotateTimeoutId);
                     this.rotateTimeoutId = false;
-                    //console.log('test');
-
                 }
-                console.log('Sateesh '+ this.currentScrollPoint+' hai '+ this.scrollCount);
 
                 this.currentScrollPoint=Math.round(this.currentScrollPoint);
                 this.$slides.css('transition', 'transform '+(this.settings.rotationSpeed)+'s ease-in-out');
@@ -270,23 +267,23 @@
                         this.change=false;
                     }else{
                         this.change=true;
+                        //points position change
                     }
                 }
                 //console.log('currentChange '+ this.$slidesContainer.attr('currentPos')+' hellwo '+ this.currentScrollPoint);
+                console.log('scrollPoint: '+ this.scrollPoint);
                 this.$slides.each(function(i,el){
                     var $slide=$(el);
                     if(this.change == true){
-
-
-
-                        if(this.currentScrollPoint < 0 || this.$slidesContainer.attr('currentPos') > this.currentScrollPoint ){
+                        if((this.currentScrollPoint < 0 && this.$slidesContainer.attr('currentPos') > this.currentScrollPoint) || this.$slidesContainer.attr('currentPos') > this.currentScrollPoint ){
                             this.actualValue = -this.scrollPoint;
-                            console.log('movingTop : ' + this.currentScrollPoint);
+                            //moving top
                         }else{
-                            console.log('movingBottom : ' + this.currentScrollPoint + ' currentPos '+ this.$slidesContainer.attr('currentPos'));
                             this.actualValue = this.scrollPoint;
+                            //moving bottom
                         }
                         var topValue=parseInt($slide.attr('data-position')) + Math.round(this.actualValue);
+
                         $slide.css('top',topValue);
                         $slide.attr('data-position',topValue);
                     }else{
@@ -313,8 +310,8 @@
                     }
                     if(this.lastChildPos <= (this.scrollPoint*3)){
                         console.log('added back');
-                        this.$slidesContainer.find('li:first-child').css({'top':Math.round(this.scrollPoint*3)});
-                        this.$slidesContainer.find('li:first-child').attr('data-position', Math.round(this.scrollPoint*3));
+                        this.$slidesContainer.find('li:first-child').css({'top':(Math.round(this.scrollPoint)*3)});
+                        this.$slidesContainer.find('li:first-child').attr('data-position', (Math.round(this.scrollPoint)*3));
                         this.$slidesContainer.find('li:first-child').appendTo(this.$slidesContainer);
                     }
 
