@@ -51,20 +51,16 @@
                         this.$slidesContainer.on('mousedown touchstart', this.handleDragStart.bind(this));
                         this.$slidesContainer.on('mousemove touchmove', this.handleDragMove.bind(this));
                         this.$slidesContainer.on('mouseup mouseleave touchend', this.handleDragEnd.bind(this));
+                        $(document).on('click','.slides > li[data-point="45"],.slides > li[data-point="-315"]', this.handleRightDirectionClick.bind(this));
+                        $(document).on('click','.slides > li[data-point="-45"],.slides > li[data-point="315"]', this.handleLeftDirectionClick.bind(this));
+                        $(document).on('keyup', this.numtype.bind(this));
+                        this.$slidesContainer.on('mousewheel', { mousewheel: { debounce: {delay: 300}}, throttle: {delay: 300}}, this.mouseWheel.bind(this));
                     }else{
                         this.$slides.on('mousedown touchstart', this.handleDragStart.bind(this));
                         this.$slides.on('mousemove touchmove', this.handleDragMove.bind(this));
                         this.$slides.on('mouseup mouseleave touchend', this.handleDragEnd.bind(this));
                     }
                 }
-                //if(this.settings.directionControls){
-                this.$slider.find('ul.direction-controls .left-arrow button').click(this.handleLeftDirectionClick.bind(this));
-                this.$slider.find('ul.direction-controls .right-arrow button').click(this.handleRightDirectionClick.bind(this));
-                $(document).on('click','.slides > li[data-point="45"]', this.handleRightDirectionClick.bind(this));
-                $(document).on('click','.slides > li[data-point="-45"],.slides > li[data-point="315"]', this.handleLeftDirectionClick.bind(this));
-                $(document).on('keyup', this.numtype.bind(this));
-                this.$slidesContainer.on('mousewheel', { mousewheel: { debounce: {delay: 300}}, throttle: {delay: 300}}, this.mouseWheel.bind(this));
-                //}
             },
             handleDragStart: function(e){
                 this.readyToDrag = true;
@@ -119,7 +115,7 @@
                                 var $slide = $(el);
                                 this.setArray.push($slide.attr('data-position'));
                                 var thisValue=parseInt(this.setArray[i]);
-                                console.log('arrayValue '+this.setArray[i]+' cp '+ (this.dragPos));
+                                //console.log('arrayValue '+this.setArray[i]+' cp '+ (this.dragPos));
                                 this.topPos = thisValue - (this.dragPos);
                                 $slide.css('top', this.topPos);
                             }.bind(this));
@@ -141,11 +137,11 @@
                             this.$directionControls.css('pointer-events', '');
                         }
                     }else{
-                        console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
+                       // console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
                         this.scrollCount=Math.round(this.currentScrollPoint / this.scrollPoint);
-                        this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/6)) * (this.scrollPoint/6);
+                        this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/8)) * (this.scrollPoint/8);
 
-                        console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ this.scrollPoint);
+                        //console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ this.scrollPoint);
                         this.scrollpoints();
                         if (this.settings.directionControls) {
                             this.$directionControls.css('pointer-events', '');
@@ -185,8 +181,9 @@
                 this.$slidesContainer.css('margin', '0px');
 
                 /* Offset width and arc height */
+                console.log('lowerArc: '+ lowerArcHeight +' upperArc: '+ upperArcHeight)
                 this.$slidesContainer.css('transform', 'translateY(-50%)');
-                this.$slidesContainer.css('left', '-'+ upperArcHeight*2 +'px');
+                this.$slidesContainer.css('left', '-'+ lowerArcHeight*1.7 +'px');
 
                 /* Generate path for slide clipping */
                 var pathCoords = 'M 0 '+fullArcHeight;
@@ -197,6 +194,7 @@
                 this.$slider.find('#slideClipPath>path').attr('d', pathCoords);
 
                 /* Apply styles to each slide */
+                console.log('innerRadius:  '+ innerRadius+ 'outerRadius: '+ outerRadius)
                 this.$slides.each(function(i, el){
                     var $slide = $(el);
                     /* Set distance from point of rotation */
@@ -210,11 +208,14 @@
                     //$slide.css('padding', upperArcHeight +'px '+slideSidePadding+'px '+lowerArcHeight+'px '+slideSidePadding+'px ');
 
                     /* Offset container Arc Height */
-                    $slide.css('top', upperArcHeight +'px');
+                    //$slide.css('top', '0px');
 
+                    $slide.css({'top':'0','transform':'translateX(-50%) rotate('+this.slideAngle * i+'deg) translateY(0%)'});
                     /* Offset Width, then Rotate Slide, then offset individual Top Arcs  */
-                    $slide.css('transform', 'translateY(-50%) rotate('+this.slideAngle * i+'deg) translateX(-'+ 70 +'px)');
-                    $slide.attr('data-point', (i * this.slideAngle))
+                    //$slide.css('transform', 'translateY(-100%) rotate('+this.slideAngle * i+'deg) translateX(-50%)');
+                    $slide.attr('data-point', (i * this.slideAngle));
+
+
                     /* Add clipping path  */
                     //$slide.css('-webkit-clip-path', 'url(#slideClipPath)');
                     //$slide.css('clip-path', 'url(#slideClipPath)');
@@ -259,11 +260,11 @@
                     //console.log('test');
 
                 }
-                //console.log('Sateesh '+ this.currentScrollPoint+' hai '+ this.scrollCount);
-                //this.currentScrollPoint
+                console.log('Sateesh '+ this.currentScrollPoint+' hai '+ this.scrollCount);
+
                 this.currentScrollPoint=Math.round(this.currentScrollPoint);
                 this.$slides.css('transition', 'transform '+(this.settings.rotationSpeed)+'s ease-in-out');
-                console.log('currentScroll '+Math.round(this.currentScrollPoint));
+                //console.log('currentScroll '+Math.round(this.currentScrollPoint));
                 if(this.$slidesContainer.attr('currentPos')){
                     if(this.$slidesContainer.attr('currentPos')==this.currentScrollPoint){
                         this.change=false;
@@ -271,13 +272,18 @@
                         this.change=true;
                     }
                 }
-                console.log('currentChange '+ this.$slidesContainer.attr('currentPos')+' hellwo '+ this.currentScrollPoint);
+                //console.log('currentChange '+ this.$slidesContainer.attr('currentPos')+' hellwo '+ this.currentScrollPoint);
                 this.$slides.each(function(i,el){
                     var $slide=$(el);
                     if(this.change == true){
-                        if(this.currentScrollPoint < 0 && this.$slidesContainer.attr('currentPos') > this.currentScrollPoint ){
+
+
+
+                        if(this.currentScrollPoint < 0 || this.$slidesContainer.attr('currentPos') > this.currentScrollPoint ){
                             this.actualValue = -this.scrollPoint;
+                            console.log('movingTop : ' + this.currentScrollPoint);
                         }else{
+                            console.log('movingBottom : ' + this.currentScrollPoint + ' currentPos '+ this.$slidesContainer.attr('currentPos'));
                             this.actualValue = this.scrollPoint;
                         }
                         var topValue=parseInt($slide.attr('data-position')) + Math.round(this.actualValue);
@@ -293,14 +299,20 @@
 
                 this.rotateTimeoutId = setTimeout(function(){
                  this.currentlyRotating = false;
+
+
                     this.firstChildPos=this.$slidesContainer.find('li:first-child').attr('data-position');
                     this.lastChildPos=this.$slidesContainer.find('li:last-child').attr('data-position');
+                    console.log('current pos: '+ this.$slidesContainer.find('li:first-child').attr('data-position'));
+
                     if(this.firstChildPos==0){
+                        console.log('added front');
                         this.$slidesContainer.find('li:last-child').css({'top':Math.round('-'+(this.scrollPoint))});
                         this.$slidesContainer.find('li:last-child').attr('data-position', Math.round('-'+(this.scrollPoint)));
                         this.$slidesContainer.find('li:last-child').prependTo(this.$slidesContainer);
                     }
                     if(this.lastChildPos <= (this.scrollPoint*3)){
+                        console.log('added back');
                         this.$slidesContainer.find('li:first-child').css({'top':Math.round(this.scrollPoint*3)});
                         this.$slidesContainer.find('li:first-child').attr('data-position', Math.round(this.scrollPoint*3));
                         this.$slidesContainer.find('li:first-child').appendTo(this.$slidesContainer);
@@ -329,7 +341,7 @@
                 this.$slides.each(function(i, el){
                     var $slide = $(el);
                     $slide.attr('data-point', (parseInt($slide.attr('data-point')) - this.slideAngle))
-                    if(parseInt($slide.attr('data-point')) > this.listAngle){
+                    if(parseInt($slide.attr('data-point')) < ('-'+this.listAngle)){
                         $slide.attr('data-point', 0)
                     }
                 }.bind(this));
