@@ -8,6 +8,8 @@
                 this.$clipPath;
                 this.$directionControls;
 
+                this.menuSize=(window.innerWidth > window.innerHeight) ? (window.innerHeight*1.1) : (window.innerHeight*1.1);
+
                 this.settings = $.extend({
                     autoRotate: false,
                     autoRotateInterval: 6000,
@@ -16,9 +18,15 @@
                     directionLeftText: '&lsaquo;',
                     directionRightText: '&rsaquo;',
                     rotationSpeed: 750,
-                    slideHeight : 360,
-                    slideWidth : 480,
+                    //slideHeight : this.menuSize,
+                    //slideWidth : this.menuSize,
+                    isMobile:false,
                 }, options);
+
+                if( /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+                    this.settings.isMobile=true;
+                }
+
 
                 this.slideAngle = 360 / this.$slides.length;
                 this.listAngle=(this.$slides.length-1) * this.slideAngle;
@@ -47,7 +55,11 @@
             },
             bindEvents: function(){
                 if(this.settings.draggable){
-                    if($(window).width()>767) {
+                    if(this.settings.isMobile){
+                        this.$slides.on('mousedown touchstart', this.handleDragStart.bind(this));
+                        this.$slides.on('mousemove touchmove', this.handleDragMove.bind(this));
+                        this.$slides.on('mouseup mouseleave touchend', this.handleDragEnd.bind(this));
+                    }else{
                         this.$slidesContainer.on('mousedown touchstart', this.handleDragStart.bind(this));
                         this.$slidesContainer.on('mousemove touchmove', this.handleDragMove.bind(this));
                         this.$slidesContainer.on('mouseup mouseleave touchend', this.handleDragEnd.bind(this));
@@ -55,11 +67,8 @@
                         $(document).on('click','.slides > li[data-point="-45"],.slides > li[data-point="315"]', this.handleLeftDirectionClick.bind(this));
                         $(document).on('keyup', this.numtype.bind(this));
                         this.$slidesContainer.on('mousewheel', { mousewheel: { debounce: {delay: 300}}, throttle: {delay: 300}}, this.mouseWheel.bind(this));
-                    }else{
-                        this.$slides.on('mousedown touchstart', this.handleDragStart.bind(this));
-                        this.$slides.on('mousemove touchmove', this.handleDragMove.bind(this));
-                        this.$slides.on('mouseup mouseleave touchend', this.handleDragEnd.bind(this));
                     }
+
                 }
             },
             handleDragStart: function(e){
@@ -72,28 +81,7 @@
 
                     var pageY = (e.type === 'mousemove') ? e.pageY : e.originalEvent.touches[0].pageY;
 
-                    if($(window).width()>767){
-                        if(
-                            this.currentlyDragging === false &&
-                            this.currentlyRotating === false  &&
-                            (this.dragStartPoint - pageY > 10 || this.dragStartPoint - pageY < -10)
-                        ){
-                            this.stopAutoRotate();
-                            if(this.settings.directionControls){
-                                this.$directionControls.css('pointer-events', 'none');
-                            }
-                            window.getSelection().removeAllRanges();
-                            this.currentlyDragging = true;
-                            this.dragStartAngle = this.currentRotationAngle;
-                            //console.log('currentROtateAngle: '+ this.currentRotationAngle);
-                        }
-                        if(this.currentlyDragging){
-                            //console.log('dragPos '+(this.dragStartPoint - pageY))
-                            this.currentRotationAngle = this.dragStartAngle - ((this.dragStartPoint - pageY) / this.settings.slideWidth * this.slideAngle);
-                            //console.log('currentROtateAngle: '+ this.currentRotationAngle);
-                            this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
-                        }
-                    }else{
+                    if(this.settings.isMobile){
                         if(
                             this.currentlyDragging === false &&
                             this.currentlyRotating === false  &&
@@ -115,38 +103,56 @@
                                 var $slide = $(el);
                                 this.setArray.push($slide.attr('data-position'));
                                 var thisValue=parseInt(this.setArray[i]);
-                                //console.log('arrayValue '+this.setArray[i]+' cp '+ (this.dragPos));
                                 this.topPos = thisValue - (this.dragPos);
                                 $slide.css('top', this.topPos);
                             }.bind(this));
                         }
+                    }else{
+                        if(
+                            this.currentlyDragging === false &&
+                            this.currentlyRotating === false  &&
+                            (this.dragStartPoint - pageY > 10 || this.dragStartPoint - pageY < -10)
+                        ){
+                            this.stopAutoRotate();
+                            if(this.settings.directionControls){
+                                this.$directionControls.css('pointer-events', 'none');
+                            }
+                            window.getSelection().removeAllRanges();
+                            this.currentlyDragging = true;
+                            this.dragStartAngle = this.currentRotationAngle;
+                            //console.log('currentROtateAngle: '+ this.currentRotationAngle);
+                        }
+                        if(this.currentlyDragging){
+                            this.currentRotationAngle = this.dragStartAngle - ((this.dragStartPoint - pageY) / this.menuSize * this.slideAngle);
+                            this.$slidesContainer.css('transform', 'translateY(-50%) rotate('+this.currentRotationAngle+'deg)');
+                        }
                     }
+
                 }
             },
             handleDragEnd: function(e){
                 this.readyToDrag = false;
                 if(this.currentlyDragging){
-
                     this.currentlyDragging = false;
-                    if($(window).width()>767) {
-                        console.log('hai '+ this.currentRotationAngle+' hewlo '+this.slideAngle);
-                        this.currentRotationAngle = Math.round(this.currentRotationAngle / this.slideAngle) * this.slideAngle;
-                        console.log('currentROtateAngle End: '+ this.currentRotationAngle + 'slideAngle '+ this.slideAngle);
-                        this.rotate();
-                        if (this.settings.directionControls) {
-                            this.$directionControls.css('pointer-events', '');
-                        }
-                    }else{
-                       // console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
+                    if(this.settings.isMobile){
+                        // console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
                         this.scrollCount=Math.round(this.currentScrollPoint / this.scrollPoint);
                         this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/8)) * (this.scrollPoint/8);
 
                         //console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ this.scrollPoint);
-                        this.scrollpoints();
+                        this.mobileScrollpoints();
+                        if (this.settings.directionControls) {
+                            this.$directionControls.css('pointer-events', '');
+                        }
+                    }else{
+                        //console.log('hai '+ this.currentRotationAngle+' hewlo '+this.slideAngle);
+                        this.currentRotationAngle = Math.round(this.currentRotationAngle / (this.slideAngle)) * (this.slideAngle);
+                        this.rotate();
                         if (this.settings.directionControls) {
                             this.$directionControls.css('pointer-events', '');
                         }
                     }
+
                 }
             },
             handleLeftDirectionClick: function(e){
@@ -161,19 +167,19 @@
             },
             renderSlider: function(){
                 var halfAngleRadian = this.slideAngle / 2 * Math.PI/180;
-                var innerRadius = 1 / Math.tan(halfAngleRadian) * this.settings.slideWidth / 2;
-                var outerRadius = Math.sqrt(Math.pow(innerRadius + this.settings.slideHeight, 2) + (Math.pow((this.settings.slideWidth / 2), 2)));
-                upperArcHeight = outerRadius - (innerRadius + this.settings.slideHeight);
+                var innerRadius = 1 / Math.tan(halfAngleRadian) * this.menuSize / 2;
+                var outerRadius = Math.sqrt(Math.pow(innerRadius + this.menuSize, 2) + (Math.pow((this.menuSize / 2), 2)));
+                upperArcHeight = outerRadius - (innerRadius + this.menuSize);
                 lowerArcHeight = innerRadius - (innerRadius * (Math.cos(halfAngleRadian)));
                 var slideFullWidth = (Math.sin(halfAngleRadian) * outerRadius) * 2;
-                var slideFullHeight = upperArcHeight + this.settings.slideHeight + lowerArcHeight
-                var slideSidePadding = (slideFullWidth - this.settings.slideWidth) / 2;
+                var slideFullHeight = upperArcHeight + this.menuSize + lowerArcHeight
+                var slideSidePadding = (slideFullWidth - this.menuSize) / 2;
                 var fullArcHeight = outerRadius - (outerRadius * (Math.cos(halfAngleRadian)));
                 var lowerArcOffset = (slideFullWidth - (Math.sin(halfAngleRadian) * innerRadius * 2)) / 2;
 
                 /* Set height and width of slider element */
-                this.$slider.css('height', this.settings.slideHeight+'px');
-                this.$slider.css('width', this.settings.slideWidth+'px');
+                this.$slider.css('height', this.menuSize+'px');
+                this.$slider.css('width', this.menuSize+'px');
 
                 /* Set height and width of slides container and offset width*/
                 this.$slidesContainer.css('height', innerRadius+'px');
@@ -230,7 +236,9 @@
                     this.$slider.append(directionArrowsHTML);
                     this.$directionControls = this.$slider.find('ul.direction-controls');
                 }
-                if($(window).width()<768){
+                if(this.settings.isMobile){
+                    this.$slider.css('height', Math.round($(window).height())+'px');
+                    this.$slider.css('width', '100px');
                     this.$slidesContainer.css('width', '100%');
                     this.$slidesContainer.css('height', ($(window).height() * 1.5)+'px');
                     this.$slidesContainer.css('transform', 'translateY(0%)');
@@ -252,7 +260,7 @@
 
                 }
             },
-            scrollpoints: function(){
+            mobileScrollpoints: function(){
                 this.currentlyRotating = true;
                 if(this.rotateTimeoutId){
                     clearTimeout(this.rotateTimeoutId);
@@ -293,6 +301,9 @@
                     }
                 }.bind(this));
                 this.$slidesContainer.attr('currentPos',this.currentScrollPoint);
+                this.addactivepointPos =setTimeout(function(){
+                    this.$slidesContainer.find('li[data-position="'+Math.round(this.scrollPoint)+'"]').css('top', '100px');
+                }.bind(this), this.settings.rotationSpeed/1000);
 
                 this.rotateTimeoutId = setTimeout(function(){
                  this.currentlyRotating = false;
@@ -300,16 +311,14 @@
 
                     this.firstChildPos=this.$slidesContainer.find('li:first-child').attr('data-position');
                     this.lastChildPos=this.$slidesContainer.find('li:last-child').attr('data-position');
-                    console.log('current pos: '+ this.$slidesContainer.find('li:first-child').attr('data-position'));
+                    //console.log('current pos: '+ this.$slidesContainer.find('li:first-child').attr('data-position'));
 
                     if(this.firstChildPos==0){
-                        console.log('added front');
                         this.$slidesContainer.find('li:last-child').css({'top':Math.round('-'+(this.scrollPoint))});
                         this.$slidesContainer.find('li:last-child').attr('data-position', Math.round('-'+(this.scrollPoint)));
                         this.$slidesContainer.find('li:last-child').prependTo(this.$slidesContainer);
                     }
                     if(this.lastChildPos <= (this.scrollPoint*3)){
-                        console.log('added back');
                         this.$slidesContainer.find('li:first-child').css({'top':(Math.round(this.scrollPoint)*3)});
                         this.$slidesContainer.find('li:first-child').attr('data-position', (Math.round(this.scrollPoint)*3));
                         this.$slidesContainer.find('li:first-child').appendTo(this.$slidesContainer);
@@ -435,8 +444,10 @@
                 if (wheelTiming == true) {
                     wheelTiming = false;
                     if (delta > 0) {
+                        this.stopAutoRotate();
                         this.rotateCounterClockwise();
                     } else {
+                        this.stopAutoRotate();
                         this.rotateClockwise();
                     }
                 }
