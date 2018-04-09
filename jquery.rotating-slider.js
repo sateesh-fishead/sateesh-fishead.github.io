@@ -140,7 +140,7 @@
                     if(this.settings.isMobile){
                         // console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
                         this.scrollCount=Math.round(this.currentScrollPoint / this.scrollPoint);
-                        this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/8)) * (this.scrollPoint/8);
+                        this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/3)) * (this.scrollPoint/3);
                         console.log('scrollPoint '+ this.currentScrollPoint);
                         //console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ this.scrollPoint);
                         this.mobileScrollpoints();
@@ -249,9 +249,9 @@
                     this.$slidesContainer.css('height', ($(window).height() * 1.5)+'px');
                     this.$slidesContainer.css('transform', 'translateY(0%)');
                     this.$slidesContainer.css('left', '0px');
-
+                    this.scrollPoint=Math.round(this.scrollPoint)
                     if(Math.round(this.scrollPoint)%2 != 0){
-                        this.scrollPoint=Math.round(this.scrollPoint) - 1;
+                        //this.scrollPoint=Math.round(this.scrollPoint) - 1;
                     }
                     this.$slides.each(function(i, el){
                         var $slide = $(el);
