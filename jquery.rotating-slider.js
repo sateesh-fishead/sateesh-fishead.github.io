@@ -140,7 +140,7 @@
                     if(this.settings.isMobile){
                         // console.log('hai '+ this.currentScrollPoint+' hewlo '+this.scrollPoint);
                         this.scrollCount=Math.round(this.currentScrollPoint / this.scrollPoint);
-                        this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/4)) * (this.scrollPoint/4);
+                        this.currentScrollPoint= Math.round(this.currentScrollPoint / (this.scrollPoint/3)) * (this.scrollPoint/3);
                         console.log('scrollPoint '+ this.currentScrollPoint);
                         //console.log('currentROtateAngle End: '+ this.currentScrollPoint + ' slideAngle '+ this.scrollPoint);
                         this.mobileScrollpoints();
