@@ -340,8 +340,9 @@
                         this.$slidesContainer.children('li:last-child').prependTo(this.$slidesContainer);
                     }
                     if(this.lastChildPos <= (this.scrollPoint*3)){
-                        this.$slidesContainer.children('li:first-child').css({'top':(this.scrollPoint*3)});
-                        this.$slidesContainer.children('li:first-child').attr('data-position', (this.scrollPoint*3));
+                        //alert('hai');
+                        this.$slidesContainer.children('li:first-child').css({'top':(this.scrollPoint*4)});
+                        this.$slidesContainer.children('li:first-child').attr('data-position', (this.scrollPoint*4));
                         this.$slidesContainer.children('li:first-child').appendTo(this.$slidesContainer);
                     }
 
