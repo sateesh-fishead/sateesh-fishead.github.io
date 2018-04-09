@@ -249,9 +249,9 @@
                     this.$slidesContainer.css('height', ($(window).height() * 1.5)+'px');
                     this.$slidesContainer.css('transform', 'translateY(0%)');
                     this.$slidesContainer.css('left', '0px');
-
-                    if(Math.round(this.scrollPoint)%2 != 0){
-                        this.scrollPoint=Math.round(this.scrollPoint) - 1;
+                    this.scrollPoint=Math.round(this.scrollPoint);
+                    if(this.scrollPoint%2 != 0){
+                        this.scrollPoint=this.scrollPoint - 1;
                     }
                     this.$slides.each(function(i, el){
                         var $slide = $(el);
@@ -316,9 +316,11 @@
                 }.bind(this));
                 this.$slidesContainer.attr('currentPos',this.currentScrollPoint);
                 this.addactivepointPos =setTimeout(function(){
+                    //alert(this.activeItemPos+' hai '+ this.scrollPoint);
                     this.nagativeValuePos='-'+this.activeItemPos;
                     this.positiveValuePos=3*this.activeItemPos;
                     this.positiveValueStayPos=4*this.activeItemPos;
+
                     this.$slidesContainer.children('li[data-position="'+this.scrollPoint+'"]').css('top', this.activeItemPos+'px');
                     this.$slidesContainer.children('li[data-position='+this.nagativeValuePos+']').css('top', '0');
                     this.$slidesContainer.children('li[data-position='+this.nagativeValuePos+']').attr('data-position',0);
