@@ -208,26 +208,9 @@
                     var $slide = $(el);
                     /* Set distance from point of rotation */
                     $slide.css('transform-origin', 'center '+(innerRadius/2)+'px');
-
-                    /* Set slide Height and Width */
-                    //$slide.css('height', this.settings.slideHeight+'px');
-                    //$slide.css('width', this.settings.slideWidth+'px');
-
-                    /* Set calculated padding for width, upper arc height, and lower arc height */
-                    //$slide.css('padding', upperArcHeight +'px '+slideSidePadding+'px '+lowerArcHeight+'px '+slideSidePadding+'px ');
-
-                    /* Offset container Arc Height */
-                    //$slide.css('top', '0px');
-
                     $slide.css({'top':'0','transform':'translateX(-50%) rotate('+this.slideAngle * i+'deg) translateY(0%)'});
-                    /* Offset Width, then Rotate Slide, then offset individual Top Arcs  */
-                    //$slide.css('transform', 'translateY(-100%) rotate('+this.slideAngle * i+'deg) translateX(-50%)');
                     $slide.attr('data-point', (i * this.slideAngle));
 
-
-                    /* Add clipping path  */
-                    //$slide.css('-webkit-clip-path', 'url(#slideClipPath)');
-                    //$slide.css('clip-path', 'url(#slideClipPath)');
                 }.bind(this));
 
                 /* Render Arrow Controls */
@@ -316,11 +299,9 @@
                 }.bind(this));
                 this.$slidesContainer.attr('currentPos',this.currentScrollPoint);
                 this.addactivepointPos =setTimeout(function(){
-                    //alert(this.activeItemPos+' hai '+ this.scrollPoint);
                     this.nagativeValuePos='-'+this.activeItemPos;
                     this.positiveValuePos=3*this.activeItemPos;
                     this.positiveValueStayPos=4*this.activeItemPos;
-
                     this.$slidesContainer.children('li[data-position="'+this.scrollPoint+'"]').css('top', this.activeItemPos+'px');
                     this.$slidesContainer.children('li[data-position='+this.nagativeValuePos+']').css('top', '0');
                     this.$slidesContainer.children('li[data-position='+this.nagativeValuePos+']').attr('data-position',0);
@@ -426,32 +407,52 @@
                 if ((e.keyCode >= 49 && e.keyCode <= 56) || (e.keyCode >= 97 && e.keyCode <= 104)) {
                     var keyboardValue=e.keyCode;
                     var selectElm=0;
-                    var actualValue=0;
+                    var actualPointNumber=0;
                     if((e.keyCode >= 97 && e.keyCode <= 104)){
                         for(var x=97; x <= 104; x++){
                             selectElm++;
                             if(x == keyboardValue){
-                                actualValue=selectElm;
+                                actualPointNumber=selectElm;
                             }
                         }
                     }else{
                         for(var y=49; y <= 56; y++){
                             selectElm++;
                             if(y == keyboardValue){
-                                actualValue=selectElm;
+                                actualPointNumber=selectElm;
                             }
                         }
                     }
-                    var thisPos=this.$slidesContainer.children(':nth-child('+actualValue+')').attr('data-point');
-                    var rotates=Math.abs(thisPos)/this.slideAngle;
-                    var actualValue1=this.$slides.length - rotates;
-                    this.rotateinterval=setInterval(function(){
-                        this.rotateClockwise();
-                        actualValue1--;
-                        if(actualValue1==0){
-                            clearInterval(this.rotateinterval);
+                    var thisAngle=this.$slidesContainer.children(':nth-child('+actualPointNumber+')').attr('data-point');
+                    var rotatesCount=Math.abs(thisAngle)/this.slideAngle;
+                    var actualRotateCount;
+
+                    if(rotatesCount!=0){
+                        if(rotatesCount > 5 || thisAngle < 0){
+                            if(rotatesCount < 5){
+                                //if rotateAngle goes Negative;
+                                actualRotateCount=rotatesCount;
+                            }else{
+                                actualRotateCount=this.$slides.length - rotatesCount;
+                            }
+                            this.rotateinterval=setInterval(function(){
+                                this.rotateClockwise();
+                                actualRotateCount--;
+                                if(actualRotateCount==0){
+                                    clearInterval(this.rotateinterval);
+                                }
+                            }.bind(this), this.settings.rotationSpeed/1000)
+                        }else{
+                            actualRotateCount=rotatesCount;
+                            this.counterClockInterval=setInterval(function(){
+                                this.rotateCounterClockwise();
+                                actualRotateCount--;
+                                if(actualRotateCount==0){
+                                    clearInterval(this.counterClockInterval);
+                                }
+                            }.bind(this), this.settings.rotationSpeed/1000)
                         }
-                    }.bind(this), this.settings.rotationSpeed/1000)
+                    }
 
                 }else if(e.keyCode == 38 || e.keyCode == 40){
                     if(e.keyCode == 38){
